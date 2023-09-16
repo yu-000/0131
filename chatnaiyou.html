@@ -85,7 +85,7 @@
         const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || displayMessages([]);
         
         // 一定の間隔でチャットを更新する
-        const updateInterval = 5000; // ミリ秒単位で更新間隔を指定（例: 5秒）
+        const updateInterval = 1000; // ミリ秒単位で更新間隔を指定（例: 5秒）
         setInterval(function() {
             // ローカルストレージからメッセージを読み込み
             const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
@@ -96,5 +96,3 @@
     </script>
 </body>
 </html>
-
-
