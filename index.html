@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>チャットサイト</title>
+    <title>チャットアプリ</title>
     <style>
         /* スタイルを追加 */
         body {
@@ -19,29 +19,66 @@
 </head>
 <body>
     <div class="chat-box">
-        <!-- チャットメッセージを表示するiframe -->
-        <iframe src="chatnaiyou.html" width="100%" height="300px"></iframe>
+        <div id="login-form">
+            <h2>サインイン</h2>
+            <form id="signin-form">
+                <input type="text" id="signin-username" placeholder="ユーザー名" required>
+                <input type="password" id="signin-password" placeholder="パスワード" required>
+                <button type="submit">サインイン</button>
+            </form>
+        </div>
+        <div id="chat-container" style="display: none;">
+            <!-- チャットメッセージ表示エリア -->
+            <div id="chat-messages">
+                <!-- チャットメッセージはここに追加されます -->
+            </div>
+
+            <!-- チャット入力フォーム -->
+            <form id="chat-form">
+                <input type="text" id="message" placeholder="メッセージ" required>
+                <button type="submit">送信</button>
+            </form>
+        </div>
     </div>
 
-    <!-- チャット入力フォーム -->
-    <form id="chat-form">
-        <input type="text" id="username" placeholder="ユーザー名" required>
-        <input type="text" id="message" placeholder="メッセージ" required>
-        <button type="submit">送信</button>
-    </form>
-
     <script>
+        // チャットメッセージを表示する関数
+        function displayMessages(messages) {
+            const chatMessagesDiv = document.getElementById("chat-messages");
+            chatMessagesDiv.innerHTML = "";
+
+            messages.forEach((message, index) => {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message");
+                messageDiv.innerHTML = `
+                    <strong>${message.username}:</strong> ${message.message}
+                `;
+                chatMessagesDiv.appendChild(messageDiv);
+            });
+        }
+
+        // サインインフォームの送信イベントハンドラ
+        document.getElementById("signin-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const username = document.getElementById("signin-username").value;
+            const password = document.getElementById("signin-password").value;
+
+            // バックエンドでのサインイン処理を実行する必要があります
+            // ここでは仮の処理として、サインイン成功後にチャット画面を表示します
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("chat-container").style.display = "block";
+        });
+
         // チャットフォームの送信イベントハンドラ
         document.getElementById("chat-form").addEventListener("submit", function (e) {
             e.preventDefault();
-            const username = document.getElementById("username").value;
             const message = document.getElementById("message").value;
 
-            // メッセージをチャット内容を表示するiframeに送信
-            const chatFrame = document.querySelector('iframe');
-            chatFrame.contentWindow.postMessage({ username, message }, '*');
+            // バックエンドでのメッセージ送信処理を実行する必要があります
+            // ここでは仮の処理として、メッセージを表示します
+            const username = document.getElementById("signin-username").value;
+            displayMessages([{ username, message }]);
 
-            document.getElementById("username").value = "";
             document.getElementById("message").value = "";
         });
     </script>
