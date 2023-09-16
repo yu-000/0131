@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>チャット内容</title>
+    <style>
+        /* スタイルを追加 */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .delete-button {
+            background-color: #ff0000;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- チャットメッセージ表示エリア -->
+    <div id="chat-messages">
+        <!-- チャットメッセージはここに追加されます -->
+    </div>
+
+    <script>
+        // チャットメッセージを表示する関数
+        function displayMessages(messages, currentUsername) {
+            const chatMessagesDiv = document.getElementById("chat-messages");
+            chatMessagesDiv.innerHTML = "";
+
+            messages.forEach((message, index) => {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message");
+
+                // 投稿者が現在のユーザー（または管理者）であれば削除ボタンを表示
+                const deleteButtonHtml = message.username === currentUsername
+                    ? `<button class="delete-button" onclick="deleteMessage(${index})">削除</button>`
+                    : '';
+
+                messageDiv.innerHTML = `
+                    <strong>${message.username}:</strong> ${message.message}
+                    ${deleteButtonHtml}
+                `;
+                chatMessagesDiv.appendChild(messageDiv);
+            });
+        }
+
+        // メッセージを受信したときのイベントハンドラ
+        window.addEventListener("message", function (event) {
+            if (event.data.username && event.data.message) {
+                // ローカルストレージから既存のメッセージを読み込む
+                let savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+                
+                // 特定の単語を含むメッセージを削除
+                if (event.data.message.includes("削除")) {
+                    return;
+                }
+
+                savedMessages.push(event.data);
+
+                // ローカルストレージに新しいメッセージを保存
+                localStorage.setItem("chatMessages", JSON.stringify(savedMessages));
+
+                // メッセージを表示
+                displayMessages(savedMessages, event.data.username);
+            }
+        });
+
+        // メッセージを削除する関数
+        function deleteMessage(index) {
+            // ローカルストレージからメッセージを読み込み
+            let savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+            if (index >= 0 && index < savedMessages.length) {
+                // 指定されたインデックスのメッセージを削除
+                savedMessages.splice(index, 1);
+
+                // ローカルストレージに更新されたメッセージを保存
+                localStorage.setItem("chatMessages", JSON.stringify(savedMessages));
+
+                // メッセージを表示
+                displayMessages(savedMessages, currentUsername);
+            }
+        }
+
+        // 初回表示時にローカルストレージからメッセージを読み込んで表示
+        const currentUsername = "ユーザーA"; // 現在のユーザー名を設定（仮の値）
+        const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+        displayMessages(savedMessages, currentUsername);
+    </script>
+</body>
+</html>
+
+
