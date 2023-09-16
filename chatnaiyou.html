@@ -12,7 +12,7 @@
         .message {
             margin-bottom: 10px;
         }
-        .delete-button {
+        .delete-button, .edit-button, .save-button {
             background-color: #ff0000;
             color: #ffffff;
             border: none;
@@ -28,6 +28,8 @@
     </div>
 
     <script>
+        let editingIndex = -1; // 編集中のメッセージのインデックス
+
         // チャットメッセージを表示する関数
         function displayMessages(messages) {
             const chatMessagesDiv = document.getElementById("chat-messages");
@@ -37,8 +39,11 @@
                 const messageDiv = document.createElement("div");
                 messageDiv.classList.add("message");
                 messageDiv.innerHTML = `
-                    <strong>${message.username}:</strong> ${message.message}
+                    <strong>${message.username}:</strong>
+                    <span id="message-text-${index}">${message.message}</span>
                     <button class="delete-button" onclick="deleteMessage(${index})">削除</button>
+                    <button class="edit-button" onclick="editMessage(${index})">編集</button>
+                    <button class="save-button" onclick="saveMessage(${index})">保存</button>
                 `;
                 chatMessagesDiv.appendChild(messageDiv);
             });
@@ -73,6 +78,36 @@
 
                 // メッセージを表示
                 displayMessages(savedMessages);
+            }
+        }
+
+        // メッセージを編集する関数
+        function editMessage(index) {
+            if (index >= 0) {
+                editingIndex = index;
+                const messageText = document.getElementById(`message-text-${index}`);
+                const message = messageText.textContent;
+                messageText.innerHTML = `<input type="text" id="edit-message-${index}" value="${message}">`;
+            }
+        }
+
+        // 編集中のメッセージを保存する関数
+        function saveMessage(index) {
+            if (index === editingIndex) {
+                const editedMessage = document.getElementById(`edit-message-${index}`).value;
+                // ローカルストレージからメッセージを読み込み
+                let savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+                if (index >= 0 && index < savedMessages.length) {
+                    // 指定されたインデックスのメッセージを更新
+                    savedMessages[index].message = editedMessage;
+
+                    // ローカルストレージに更新されたメッセージを保存
+                    localStorage.setItem("chatMessages", JSON.stringify(savedMessages));
+
+                    // メッセージを表示
+                    displayMessages(savedMessages);
+                    editingIndex = -1; // 編集モードを終了
+                }
             }
         }
 
