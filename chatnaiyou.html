@@ -38,7 +38,7 @@
                 messageDiv.classList.add("message");
                 messageDiv.innerHTML = `
                     <strong>${message.username}:</strong> ${message.message}
-                    <button class="delete-button" onclick="deleteMessage(${index})">削除</button>
+                    ${message.deletable ? `<button class="delete-button" onclick="deleteMessage(${index})">削除</button>` : ''}
                 `;
                 chatMessagesDiv.appendChild(messageDiv);
             });
@@ -50,13 +50,32 @@
                 // ローカルストレージから既存のメッセージを読み込む
                 let savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
                 
-                savedMessages.push(event.data);
+                // 特定の単語を含むメッセージを削除
+                if (event.data.message.includes("削除")) {
+                    // メッセージが投稿されたデバイスのIDを取得
+                    const deviceID = event.data.deviceID;
 
-                // ローカルストレージに新しいメッセージを保存
-                localStorage.setItem("chatMessages", JSON.stringify(savedMessages));
+                    // ローカルストレージに保存されたメッセージとデバイスIDを照合して削除権限を確認
+                    const deletable = savedMessages.some(message => message.deviceID === deviceID);
 
-                // メッセージを表示
-                displayMessages(savedMessages);
+                    // 削除可能なメッセージを追加
+                    savedMessages.push({ ...event.data, deletable });
+
+                    // ローカルストレージに新しいメッセージを保存
+                    localStorage.setItem("chatMessages", JSON.stringify(savedMessages));
+
+                    // メッセージを表示
+                    displayMessages(savedMessages);
+                } else {
+                    // 削除権限がない場合、削除ボタンを表示しない
+                    savedMessages.push(event.data);
+
+                    // ローカルストレージに新しいメッセージを保存
+                    localStorage.setItem("chatMessages", JSON.stringify(savedMessages));
+
+                    // メッセージを表示
+                    displayMessages(savedMessages);
+                }
             }
         });
 
@@ -64,8 +83,8 @@
         function deleteMessage(index) {
             // ローカルストレージからメッセージを読み込み
             let savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
-            if (index >= 0 && index < savedMessages.length) {
-                // 指定されたインデックスのメッセージを削除
+            if (index >= 0 && index < savedMessages.length && savedMessages[index].deletable) {
+                // 削除可能なメッセージを削除
                 savedMessages.splice(index, 1);
 
                 // ローカルストレージに更新されたメッセージを保存
@@ -77,8 +96,10 @@
         }
 
         // 初回表示時にローカルストレージからメッセージを読み込んで表示
-        const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || displayMessages([]);
+        const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+        displayMessages(savedMessages);
     </script>
 </body>
 </html>
+
 
