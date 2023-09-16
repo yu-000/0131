@@ -50,11 +50,6 @@
                 // ローカルストレージから既存のメッセージを読み込む
                 let savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
                 
-                // 特定の単語を含むメッセージを削除
-                if (event.data.message.includes("削除")) {
-                    return;
-                }
-
                 savedMessages.push(event.data);
 
                 // ローカルストレージに新しいメッセージを保存
@@ -83,16 +78,7 @@
 
         // 初回表示時にローカルストレージからメッセージを読み込んで表示
         const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || displayMessages([]);
-        
-        // 一定の間隔でチャットを更新する
-        const updateInterval = 1000; // ミリ秒単位で更新間隔を指定（例: 5秒）
-        setInterval(function() {
-            // ローカルストレージからメッセージを読み込み
-            const savedMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
-            
-            // メッセージを表示
-            displayMessages(savedMessages);
-        }, updateInterval);
     </script>
 </body>
 </html>
+
